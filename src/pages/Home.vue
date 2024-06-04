@@ -1,5 +1,4 @@
 <script setup>
-import {ref} from "vue";
 import AppLayout from "@/components/AppLayout.vue";
 import {useRootStore} from "@/stores/root.js";
 import {storeToRefs} from "pinia";
@@ -8,11 +7,10 @@ import CocktailThumb from "@/components/CocktailThumb.vue";
 const rootStore = useRootStore();
 rootStore.getIngredients()
 
-const {ingredients, cocktails} = storeToRefs(rootStore);
-const ingredient = ref(null);
+const {ingredients, ingredient, cocktails} = storeToRefs(rootStore);
 
 function getCocktails() {
-  rootStore.getCocktails(ingredient.value)
+  rootStore.getCocktails(rootStore.ingredient)
 }
 </script>
 
@@ -26,10 +24,12 @@ function getCocktails() {
         <div class="line"></div>
         <div class="select-wrapper">
           <el-select
-              v-model="ingredient"
+              v-model="rootStore.ingredient"
               placeholder="Choose main ingredient"
               size="large"
               style="width: 240px"
+              filterable
+              allow-create
               class="select"
               @change="getCocktails"
           >
@@ -60,15 +60,6 @@ function getCocktails() {
 <style lang="sass" scoped>
 @import "../assets/styles/main"
 
-.wrapper
-  display: flex
-  justify-content: center
-  align-items: center
-
-.info
-  padding: 80px 0
-  text-align: center
-
 .select-wrapper
   padding-top: 50px
 
@@ -88,7 +79,7 @@ function getCocktails() {
 
 .cocktails
   display: flex
-  justify-content: space-between
+  justify-content: center
   align-items: center
   flex-wrap: wrap
   margin-top: 60px
@@ -96,7 +87,7 @@ function getCocktails() {
   overflow-y: auto
 
 .cocktails::-webkit-scrollbar
-  width: 12px
+  width: 2px
   height: 12px
 
 </style>
