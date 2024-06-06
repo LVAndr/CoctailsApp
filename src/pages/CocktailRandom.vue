@@ -1,16 +1,14 @@
 <script setup>
 import axios from "axios";
-import {useRoute, useRouter} from "vue-router";
-import {COCKTAIL_RANDOM} from "@/constans/api.js";
+import {COCKTAIL_RANDOM, INGREDIENT_PIC} from "@/constans/api.js";
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import 'swiper/css';
 import AppLayout from "@/components/AppLayout.vue";
 import {computed, ref} from "vue";
 
-const route = useRoute();
-const router = useRouter();
+
 
 const cocktail = ref(null);
-const cocktailId = computed(()=> route.path.split("/").pop());
-
 const ingredients = computed(()=> {
   const ingredients = [];
   for (let i=1; i <= 15; i++) {
@@ -18,9 +16,7 @@ const ingredients = computed(()=> {
       break
     }
 
-    const ingredient = {}
-    ingredient.name = cocktail.value[`strIngredient${i}`];
-    ingredient.measure = cocktail.value[`strMeasure${i}`];
+    const ingredient = cocktail.value[`strIngredient${i}`];
 
     ingredients.push(ingredient);
   }
@@ -33,10 +29,6 @@ async function getCocktail() {
   cocktail.value = data?.data?.drinks[0];
 }
 
-function goBack(){
-  router.go(-1)
-}
-
 getCocktail();
 </script>
 
@@ -44,12 +36,28 @@ getCocktail();
   <div class="wrap" v-if="cocktail">
     <AppLayout
         :imgUrl="`${cocktail.strDrinkThumb}`"
-        :backFunc="goBack"
     >
       <div class="wrapper">
         <div class="info">
           <div class="title">{{cocktail.strDrink}}</div>
           <div class="line"></div>
+          <div class="slider">
+            <swiper
+                :slides-per-view="3"
+                :space-between="50"
+                class="swiper"
+            >
+              <swiper-slide
+              v-for="(ingredient, key) in ingredients"
+              :key="key"
+              class="cocktail-slide"
+              >
+                <img :src="`${INGREDIENT_PIC}${ingredient}-Small.png`" :alt="`${ingredient} image`">
+                <div class="name">{{ingredient}}</div>
+              </swiper-slide>
+
+            </swiper>
+          </div>
           <div class="instructions">
             {{cocktail.strInstructions}}
           </div>
@@ -63,5 +71,16 @@ getCocktail();
 <style scoped lang="sass">
 @import "../assets/styles/main"
 
+.slider
+  padding: 50px 0
 
+.swiper
+  max-width: 586px
+
+.cocktail-slide
+  cursor: pointer
+
+
+.name
+  padding-top: 20px
 </style>
